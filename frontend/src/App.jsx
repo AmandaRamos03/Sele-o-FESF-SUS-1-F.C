@@ -6,131 +6,179 @@ function App() {
   const [vagaSelecionada, setVagaSelecionada] = useState(null);
   const [busca, setBusca] = useState("");
   const [filtro, setFiltro] = useState("Todos");
+  const [perfil, setPerfil] = useState("candidato");
+
   const [novaVaga, setNovaVaga] = useState({
-  cargo:"",
-  empresa:"",
-  nivel:"",
-  modalidade:"",
-  salario:"",
-  tecnologias:""
-});
+    cargo:"",
+    empresa:"",
+    nivel:"",
+    modalidade:"",
+    salario:"",
+    tecnologias:""
+  });
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/vagas")
-      .then((res) => res.json())
-      .then((data) => setVagas(data))
-      .catch((erro) => console.log("Erro:", erro));
+      .then((res)=>res.json())
+      .then((data)=>setVagas(data))
+      .catch((erro)=>console.log("Erro:",erro));
   }, []);
 
-  const vagasFiltradas = vagas.filter((vaga) => {
-  const bateBusca =
-    vaga.cargo.toLowerCase().includes(busca.toLowerCase()) ||
-    vaga.empresa.toLowerCase().includes(busca.toLowerCase());
+  const vagasFiltradas = vagas.filter((vaga)=>{
 
-  const bateFiltro =
-    filtro === "Todos" ||
-    vaga.cargo.toLowerCase().includes(filtro.toLowerCase());
+    const bateBusca =
+      vaga.cargo.toLowerCase().includes(
+        busca.toLowerCase()
+      ) ||
 
-  return bateBusca && bateFiltro;
-}); 
+      vaga.empresa.toLowerCase().includes(
+        busca.toLowerCase()
+      );
 
-  const criarVaga = async () => {
+    const bateFiltro =
+      filtro==="Todos" ||
 
-await fetch(
-"http://127.0.0.1:8000/vagas",
-{
-method:"POST",
+      vaga.cargo.toLowerCase().includes(
+        filtro.toLowerCase()
+      );
 
-headers:{
-"Content-Type":"application/json"
-},
+    return bateBusca && bateFiltro;
+  });
 
-body:JSON.stringify({
-...novaVaga,
-tecnologias:
-novaVaga.tecnologias
-.split(",")
-})
-})
+  const criarVaga = async()=>{
 
-window.location.reload()
-}
+    await fetch(
+      "http://127.0.0.1:8000/vagas",
+      {
+        method:"POST",
 
-const deletarVaga = async (id) => {
+        headers:{
+          "Content-Type":"application/json"
+        },
 
-  await fetch(
-    `http://127.0.0.1:8000/vagas/${id}`,
-    {
-      method:"DELETE"
-    }
-  )
+        body:JSON.stringify({
 
-  setVagas(
-    vagas.filter(
-      vaga => vaga.id !== id
-    )
-  )
-}
+          ...novaVaga,
 
-const editarVaga = async (vaga) => {
+          tecnologias:
+          novaVaga.tecnologias
+          .split(",")
 
-  const cargoNovo =
-    prompt("Cargo:", vaga.cargo);
-
-  const empresaNova =
-    prompt("Empresa:", vaga.empresa);
-
-  const nivelNovo =
-    prompt("Nível:", vaga.nivel);
-
-  const modalidadeNova =
-    prompt("Modalidade:", vaga.modalidade);
-
-  const salarioNovo =
-    prompt("Salário:", vaga.salario);
-
-  const tecnologiasNovas =
-    prompt(
-      "Tecnologias separadas por vírgula:",
-      vaga.tecnologias.join(", ")
+        })
+      }
     );
 
-  if (!cargoNovo) return;
+    window.location.reload();
 
-  const vagaAtualizada = {
-    cargo: cargoNovo,
-    empresa: empresaNova,
-    nivel: nivelNovo,
-    modalidade: modalidadeNova,
-    salario: salarioNovo,
-    tecnologias:
-      tecnologiasNovas
-      .split(",")
-      .map(item => item.trim())
   };
 
-  await fetch(
-    `http://127.0.0.1:8000/vagas/${vaga.id}`,
-    {
-      method:"PUT",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify(vagaAtualizada)
-    }
-  );
+  const deletarVaga = async(id)=>{
 
-  setVagas(
-    vagas.map((v)=>
-      v.id===vaga.id
-      ? {...vagaAtualizada,id:vaga.id}
-      : v
-    
-    )
-  )
-}
+    await fetch(
+      `http://127.0.0.1:8000/vagas/${id}`,
+      {
+        method:"DELETE"
+      }
+    );
 
-return (
+    setVagas(
+      vagas.filter(
+        vaga=>vaga.id!==id
+      )
+    );
+
+  };
+
+  const editarVaga = async(vaga)=>{
+
+    const cargoNovo=
+      prompt(
+        "Cargo:",
+        vaga.cargo
+      );
+
+    const empresaNova=
+      prompt(
+        "Empresa:",
+        vaga.empresa
+      );
+
+    const nivelNovo=
+      prompt(
+        "Nível:",
+        vaga.nivel
+      );
+
+    const modalidadeNova=
+      prompt(
+        "Modalidade:",
+        vaga.modalidade
+      );
+
+    const salarioNovo=
+      prompt(
+        "Salário:",
+        vaga.salario
+      );
+
+    const tecnologiasNovas=
+      prompt(
+        "Tecnologias:",
+        vaga.tecnologias.join(", ")
+      );
+
+    if(!cargoNovo) return;
+
+    const vagaAtualizada={
+
+      cargo:cargoNovo,
+      empresa:empresaNova,
+      nivel:nivelNovo,
+      modalidade:modalidadeNova,
+      salario:salarioNovo,
+
+      tecnologias:
+      tecnologiasNovas
+      .split(",")
+      .map(item=>item.trim())
+    };
+
+    await fetch(
+      `http://127.0.0.1:8000/vagas/${vaga.id}`,
+      {
+        method:"PUT",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify(
+          vagaAtualizada
+        )
+      }
+    );
+
+    setVagas(
+
+      vagas.map((v)=>
+
+        v.id===vaga.id
+
+        ? {
+          ...vagaAtualizada,
+          id:vaga.id
+        }
+
+        : v
+
+      )
+
+    );
+
+  };
+
+  return (
+
     <div className="container">
 
       <h1>DevConnect</h1>
@@ -139,188 +187,271 @@ return (
         Encontre oportunidades para iniciar na tecnologia
       </p>
 
-    <div className="formulario">
-      <input
-        placeholder="Cargo"
-        onChange={(e)=>
-        setNovaVaga({
-        ...novaVaga,
-        cargo:e.target.value
-      })
-    }
-  />
+      <div className="perfil-box">
 
-      <input
-        placeholder="Empresa"
-        onChange={(e)=>
-        setNovaVaga({
-        ...novaVaga,
-        empresa:e.target.value
-      })
-    }
-  />
-      <input
-        placeholder="Nível"
-        onChange={(e)=>
-        setNovaVaga({
-        ...novaVaga,
-        nivel:e.target.value
-      })
-    }
-  />
-      <input
-        placeholder="Modalidade"
-        onChange={(e)=>
-        setNovaVaga({
-        ...novaVaga,
-        modalidade:e.target.value
-      })
-    }
-  />
+        <select
+          value={perfil}
+          onChange={(e)=>
+            setPerfil(
+              e.target.value
+            )
+          }
+        >
 
-      <input
-        placeholder="Salário"
-        onChange={(e)=>
-        setNovaVaga({
-        ...novaVaga,
-        salario:e.target.value
-      })
-    }
-  />
+          <option value="candidato">
+            Candidato
+          </option>
 
-      <input
-        placeholder="Tecnologias (React, FastAPI...)"
-        onChange={(e)=>
-        setNovaVaga({
-        ...novaVaga,
-        tecnologias:e.target.value
-      })
-    }
-  />
+          <option value="empresa">
+            Empresa
+          </option>
 
-  <button onClick={criarVaga}>
-    Adicionar vaga
-  </button>
+        </select>
 
-</div>
-    <div className="filtros">
+      </div>
 
-      <input
-      type="text"
-      placeholder="Buscar vaga..."
-      value={busca}
-      onChange={(e) => setBusca(e.target.value)}
-  />
-      <select
-        value={filtro}
-        onChange={(e)=>setFiltro(e.target.value)}
-  >
-        <option>Todos</option>
-        <option>React</option>
-        <option>Python</option>
-      </select>
 
-</div>
+      {perfil==="empresa" && (
+
+      <div className="formulario">
+
+        <input
+          placeholder="Cargo"
+          onChange={(e)=>
+            setNovaVaga({
+              ...novaVaga,
+              cargo:e.target.value
+            })
+          }
+        />
+
+        <input
+          placeholder="Empresa"
+          onChange={(e)=>
+            setNovaVaga({
+              ...novaVaga,
+              empresa:e.target.value
+            })
+          }
+        />
+
+        <input
+          placeholder="Nível"
+          onChange={(e)=>
+            setNovaVaga({
+              ...novaVaga,
+              nivel:e.target.value
+            })
+          }
+        />
+
+        <input
+          placeholder="Modalidade"
+          onChange={(e)=>
+            setNovaVaga({
+              ...novaVaga,
+              modalidade:e.target.value
+            })
+          }
+        />
+
+        <input
+          placeholder="Salário"
+          onChange={(e)=>
+            setNovaVaga({
+              ...novaVaga,
+              salario:e.target.value
+            })
+          }
+        />
+
+        <input
+          placeholder="Tecnologias"
+          onChange={(e)=>
+            setNovaVaga({
+              ...novaVaga,
+              tecnologias:e.target.value
+            })
+          }
+        />
+
+        <button onClick={criarVaga}>
+          Adicionar vaga
+        </button>
+
+      </div>
+
+      )}
+
+      <div className="filtros">
+
+        <input
+          type="text"
+          placeholder="Buscar vaga..."
+          value={busca}
+          onChange={(e)=>
+            setBusca(e.target.value)
+          }
+        />
+
+        <select
+          value={filtro}
+          onChange={(e)=>
+            setFiltro(e.target.value)
+          }
+        >
+
+          <option>
+            Todos
+          </option>
+
+          <option>
+            React
+          </option>
+
+          <option>
+            Python
+          </option>
+
+        </select>
+
+      </div>
 
       <div className="cards">
 
-        {vagasFiltradas.map((vaga) => (
-          <div className="card" key={vaga.id}>
+        {vagasFiltradas.map((vaga)=>(
 
-            <h2>{vaga.cargo}</h2>
+        <div
+          className="card"
+          key={vaga.id}
+        >
 
-            <p>
-              <strong>Empresa:</strong> {vaga.empresa}
-            </p>
+          <h2>
+            {vaga.cargo}
+          </h2>
 
-            <p>
-              <strong>Nível:</strong> {vaga.nivel}
-            </p>
+          <p>
+            <strong>Empresa:</strong>
+            {" "}
+            {vaga.empresa}
+          </p>
 
-            <div className="botoes">
+          <p>
+            <strong>Nível:</strong>
+            {" "}
+            {vaga.nivel}
+          </p>
+
+          <div className="botoes">
+
+            <button
+              onClick={()=>
+                setVagaSelecionada(vaga)
+              }
+            >
+              Ver detalhes
+            </button>
+
+            {perfil==="candidato" && (
+
+            <button
+              onClick={()=>
+                alert(
+                "Candidatura enviada 🚀"
+                )
+              }
+            >
+              Candidatar
+            </button>
+
+            )}
+
+            {perfil==="empresa" && (
+
+            <>
 
               <button
-                onClick={() => setVagaSelecionada(vaga)}
-              >
-                Ver detalhes
-              </button>
-
-              <button
-                onClick={() =>
-                  alert("Candidatura enviada com sucesso!")
+                onClick={()=>
+                  editarVaga(vaga)
                 }
               >
-                Candidatar
+                Editar
               </button>
-            <button
-              onClick={() =>
-              editarVaga(vaga)
-}
-            >
-            Editar
-            </button>
-            
+
               <button
-                onClick={() =>
-                deletarVaga(vaga.id)
-}
->
+                onClick={()=>
+                  deletarVaga(vaga.id)
+                }
+              >
                 Excluir
-                </button>
-            </div>
+              </button>
+
+            </>
+
+            )}
 
           </div>
+
+        </div>
+
         ))}
 
       </div>
 
+
       {vagaSelecionada && (
 
-        <div className="detalhes">
+      <div className="detalhes">
 
-          <h2>
-            {vagaSelecionada.cargo}
-          </h2>
+        <h2>
+          {vagaSelecionada.cargo}
+        </h2>
 
-          <p>
-            <strong>Empresa:</strong>{" "}
-            {vagaSelecionada.empresa}
-          </p>
+        <p>
+          <strong>Empresa:</strong>
+          {" "}
+          {vagaSelecionada.empresa}
+        </p>
 
-          <p>
-            <strong>Nível:</strong>{" "}
-            {vagaSelecionada.nivel}
-          </p>
+        <p>
+          <strong>Nível:</strong>
+          {" "}
+          {vagaSelecionada.nivel}
+        </p>
 
-          <p>
-            <strong>Modalidade:</strong>{" "}
-            {vagaSelecionada.modalidade}
-          </p>
+        <p>
+          <strong>Modalidade:</strong>
+          {" "}
+          {vagaSelecionada.modalidade}
+        </p>
 
-          <p>
-            <strong>Salário:</strong>{" "}
-            {vagaSelecionada.salario}
-          </p>
+        <p>
+          <strong>Salário:</strong>
+          {" "}
+          {vagaSelecionada.salario}
+        </p>
 
-          <p>
-            <strong>Tecnologias:</strong>{" "}
-            {vagaSelecionada.tecnologias.join(" • ")}
-          </p>
+        <p>
+          <strong>Tecnologias:</strong>
+          {" "}
+          {vagaSelecionada.tecnologias.join(" • ")}
+        </p>
 
-          <button
-            className="btn-fechar"
-            onClick={() =>
+        <button
+          className="btn-fechar"
+          onClick={()=>
             setVagaSelecionada(null)
-  }
-            >
-            Fechar
-</button>
+          }
+        >
+          Fechar
+        </button>
 
-        </div>
+      </div>
 
       )}
 
     </div>
+
   );
 }
 
