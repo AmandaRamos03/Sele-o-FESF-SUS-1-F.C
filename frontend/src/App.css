@@ -230,3 +230,13 @@ button:hover{
 .btn-fechar:hover{
   transform:scale(1.03);
 }
+
+.perfil-box{
+
+margin-bottom:30px;
+
+display:flex;
+
+justify-content:center;
+
+}
