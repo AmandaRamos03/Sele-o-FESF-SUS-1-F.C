@@ -64,7 +64,7 @@ O projeto foi desenvolvido utilizando React no front-end e FastAPI no back-end, 
 Primeiro clone o repositório:
 
 ```bash
-git clone https://github.com/AmandaRamos03/Selecao-FESF-SUS.git
+git clone https://github.com/AmandaRamos03/Selecao-FESF-SUS-1-F.C.git
 ```
 
 Entre na pasta do projeto:
